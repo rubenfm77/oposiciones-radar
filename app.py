@@ -213,12 +213,12 @@ with tab_boe:
 with tab_dogc:
     st.subheader("Diari Oficial de la Generalitat de Catalunya")
     st.warning(
-        "El DOGC no ofrece una API pública ni un patrón de URL de búsqueda documentado y fiable "
-        "(la búsqueda se hace mediante un formulario interactivo, no por parámetros simples en la "
-        "URL). En vez de arriesgarme a un enlace que se rompa, aquí tienes el acceso directo al "
-        "cercador oficial — escribe tú la palabra clave ahí mismo, tarda 5 segundos."
+        "El DOGC no tiene una URL de cercador fija a la que enlazar (es un formulario dinámico "
+        "sin API pública). El enlace más fiable y estable es el del **Portal Jurídic de Catalunya**, "
+        "que es el buscador avanzado oficial de todo el contenido del DOGC desde 1977."
     )
-    st.link_button("🔎 Abrir el cercador oficial del DOGC", "https://dogc.gencat.cat/ca/cercador-general/",
+    st.link_button("🔎 Abrir el Portal Jurídic de Catalunya (buscador avanzado del DOGC)",
+                    "https://portaljuridic.gencat.cat/ca/inici/",
                     use_container_width=True)
     st.caption("Palabras clave sugeridas para pegar en el buscador: " + ", ".join(
         [k for k in keywords if k.strip()]
