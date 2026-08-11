@@ -213,13 +213,16 @@ with tab_boe:
 with tab_dogc:
     st.subheader("Diari Oficial de la Generalitat de Catalunya")
     st.warning(
-        "El DOGC no ofrece una API pública equivalente a la del BOE. En vez de un scraper frágil "
-        "que se rompería con cualquier cambio de su web, aquí tienes el buscador oficial ya "
-        "pre-cargado con cada una de tus palabras clave — un clic y ves los resultados reales."
+        "El DOGC no ofrece una API pública ni un patrón de URL de búsqueda documentado y fiable "
+        "(la búsqueda se hace mediante un formulario interactivo, no por parámetros simples en la "
+        "URL). En vez de arriesgarme a un enlace que se rompa, aquí tienes el acceso directo al "
+        "cercador oficial — escribe tú la palabra clave ahí mismo, tarda 5 segundos."
     )
-    for kw in [k for k in keywords if k.strip()]:
-        url_busqueda = f"https://dogc.gencat.cat/ca/cercador-de-normativa/?text={quote_plus(kw)}"
-        st.link_button(f"🔎 Buscar «{kw}» en el DOGC", url_busqueda, use_container_width=True)
+    st.link_button("🔎 Abrir el cercador oficial del DOGC", "https://dogc.gencat.cat/ca/cercador-general/",
+                    use_container_width=True)
+    st.caption("Palabras clave sugeridas para pegar en el buscador: " + ", ".join(
+        [k for k in keywords if k.strip()]
+    ))
 
 # --- TAB AJUNTAMENTS ---
 with tab_ajuntaments:
@@ -236,15 +239,17 @@ with tab_ajuntaments:
         use_container_width=True,
     )
     st.link_button(
-        "🏘️ Ajuntament de Terrassa — Oferta pública / oposicions",
-        "https://www.terrassa.cat/oferta-publica",
+        "🏘️ Ajuntament de Terrassa — Oferta pública d'ocupació",
+        "https://aoberta.terrassa.cat/ocupacio/",
         use_container_width=True,
     )
-    st.link_button(
-        "🗺️ Diputació de Barcelona — CIDO, cercador de processos selectius de tots els municipis",
-        "https://cido.diba.cat/cercador?tipus=oposicions",
-        use_container_width=True,
-    )
+
+    st.divider()
+    st.markdown("**Diputació de Barcelona — CIDO**, agregador de processos selectius de tots els "
+                "municipis de la província (aquest sí que admet cerca per paraula clau en la URL):")
+    for kw in [k for k in keywords if k.strip()]:
+        url_cido = f"https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D={quote_plus(kw)}"
+        st.link_button(f"🔎 Buscar «{kw}» en el CIDO", url_cido, use_container_width=True)
     st.caption(
         "El CIDO de la Diputació de Barcelona es lo más parecido a un agregador de oposiciones "
         "municipales de toda la provincia — no es una API, pero es el mejor punto único de consulta "
