@@ -31,7 +31,7 @@ st.set_page_config(page_title="Radar de Oposiciones", page_icon="📋", layout="
 # Configuración de palabras clave por defecto (editable desde la barra lateral)
 # ---------------------------------------------------------------------------
 KEYWORDS_DEFAULT = [
-    "gestión de la administración civil",
+    "gestión",
     "sistemas y tecnologías de la información",
     "seguridad social",
     "gestión procesal",
@@ -149,8 +149,10 @@ with st.sidebar:
     ).splitlines()
 
     st.divider()
-    dias_atras = st.slider("Días hacia atrás a revisar en el BOE", 1, 30, 7)
-    st.caption("El BOE no publica sábados, domingos ni festivos — la app los salta sola.")
+    dias_atras = st.slider("Días hacia atrás a revisar en el BOE", 1, 90, 30)
+    st.caption("El BOE no publica sábados, domingos ni festivos — la app los salta sola. "
+               "Las grandes convocatorias (GACE, CSTI...) suelen salir 1-2 veces al año, así que "
+               "conviene mirar un rango amplio, no solo la última semana.")
 
 tab_boe, tab_dogc, tab_ajuntaments = st.tabs(["🇪🇸 BOE (AGE)", "📰 Generalitat (Oposicions)", "🏛️ Ajuntaments"])
 
@@ -184,6 +186,14 @@ with tab_boe:
         if errores:
             st.warning(f"{errores} día(s) no se pudieron consultar (error de red o fin de semana/festivo).")
 
+        st.caption(
+            "⚠️ Las palabras clave son frases exactas — si el BOE redacta el título de forma distinta "
+            "a como lo escribiste (p. ej. 'Cuerpo General' en vez de tu frase completa), no aparecerá "
+            "aquí abajo aunque sí sea relevante. Por eso te dejo también la lista SIN filtrar para que "
+            "la revises tú mismo si quieres estar 100% seguro de no perderte nada."
+        )
+
+        st.markdown("### 🎯 Coincidencias con tus palabras clave")
         if filtrados:
             for it in filtrados:
                 try:
@@ -204,7 +214,11 @@ with tab_boe:
                     continue
         else:
             st.info("No hay coincidencias con tus palabras clave en el rango de fechas elegido. "
-                    "Prueba a ampliar los días o revisar las palabras clave.")
+                    "Prueba a ampliar los días, o revisa la lista completa sin filtrar de abajo.")
+
+        with st.expander(f"📋 Ver TODOS los anuncios de oposiciones/concursos del rango ({len(todos)}), sin filtrar"):
+            for it in todos:
+                st.markdown(f"- **{it['titulo']}** · {it.get('fecha', '')} · _{it['departamento']}_")
     else:
         st.info("Pulsa el botón para consultar el BOE. La primera vez puede tardar unos segundos "
                 "por día consultado (se cachea 1h para no repetir peticiones).")
