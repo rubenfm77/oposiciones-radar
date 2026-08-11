@@ -60,6 +60,26 @@ def fetch_boe_sumario(fecha_str: str):
         return "ERROR"
 
 
+def _safe_str(x):
+    """Convierte a string limpio cualquier valor que venga del JSON del BOE. A veces un campo
+    que esperamos como texto plano llega como dict/lista si esa entrada tiene una estructura
+    distinta (p.ej. varios PDFs en vez de uno) — aquí lo normalizamos para que nunca rompa
+    un link_button, que exige un string no vacío."""
+    if x is None:
+        return ""
+    if isinstance(x, str):
+        return x.strip()
+    if isinstance(x, dict):
+        # A veces la URL viene anidada, p.ej. {"#text": "https://..."} o similar
+        for key in ("#text", "texto", "url", "@url"):
+            if key in x and isinstance(x[key], str):
+                return x[key].strip()
+        return ""
+    if isinstance(x, list) and x:
+        return _safe_str(x[0])
+    return str(x).strip()
+
+
 def _as_list(x):
     """La API del BOE a veces devuelve un dict cuando solo hay 1 elemento, y una lista si hay
     varios. Esta función normaliza siempre a lista para no romper el parsing."""
@@ -96,10 +116,10 @@ def extract_oposiciones_del_dia(sumario_json: dict):
                     nombre_depto = depto.get("nombre") or depto.get("@nombre") or "Sin departamento"
                     for it in extract_items_from_departamento(depto):
                         resultados.append({
-                            "departamento": nombre_depto,
-                            "titulo": it.get("titulo", "(sin título)"),
-                            "url_html": it.get("url_html", ""),
-                            "url_pdf": it.get("url_pdf", ""),
+                            "departamento": _safe_str(nombre_depto),
+                            "titulo": _safe_str(it.get("titulo")) or "(sin título)",
+                            "url_html": _safe_str(it.get("url_html")),
+                            "url_pdf": _safe_str(it.get("url_pdf")),
                         })
     except Exception:
         # Estructura inesperada: no rompemos la app, devolvemos lo que tengamos
@@ -132,7 +152,7 @@ with st.sidebar:
     dias_atras = st.slider("Días hacia atrás a revisar en el BOE", 1, 30, 7)
     st.caption("El BOE no publica sábados, domingos ni festivos — la app los salta sola.")
 
-tab_boe, tab_dogc, tab_ajuntaments = st.tabs(["🇪🇸 BOE (AGE)", "🎗️ DOGC (Generalitat)", "🏛️ Ajuntaments"])
+tab_boe, tab_dogc, tab_ajuntaments = st.tabs(["🇪🇸 BOE (AGE)", "📰 DOGC (Generalitat)", "🏛️ Ajuntaments"])
 
 # --- TAB BOE ---
 with tab_boe:
@@ -166,14 +186,22 @@ with tab_boe:
 
         if filtrados:
             for it in filtrados:
-                with st.container(border=True):
-                    st.markdown(f"**{it['titulo']}**")
-                    st.caption(f"📅 {it['fecha']} · 🏢 {it['departamento']}")
-                    cols = st.columns(2)
-                    if it["url_html"]:
-                        cols[0].link_button("Ver en BOE (HTML)", it["url_html"])
-                    if it["url_pdf"]:
-                        cols[1].link_button("Ver PDF", it["url_pdf"])
+                try:
+                    with st.container(border=True):
+                        st.markdown(f"**{it['titulo']}**")
+                        st.caption(f"📅 {it['fecha']} · 🏢 {it['departamento']}")
+                        cols = st.columns(2)
+                        url_html = it.get("url_html", "")
+                        url_pdf = it.get("url_pdf", "")
+                        if isinstance(url_html, str) and url_html.startswith("http"):
+                            cols[0].link_button("Ver en BOE (HTML)", url_html)
+                        if isinstance(url_pdf, str) and url_pdf.startswith("http"):
+                            cols[1].link_button("Ver PDF", url_pdf)
+                except Exception:
+                    # Si un ítem concreto viene con una estructura rara, lo saltamos
+                    # en vez de tumbar toda la app.
+                    st.caption(f"⚠️ No se pudo mostrar un resultado ({it.get('titulo', '')[:60]}...)")
+                    continue
         else:
             st.info("No hay coincidencias con tus palabras clave en el rango de fechas elegido. "
                     "Prueba a ampliar los días o revisar las palabras clave.")

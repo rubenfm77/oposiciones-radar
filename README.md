@@ -1,34 +1,34 @@
-# Radar de Oposiciones
+# Oposiciones Radar
 
-## Correrla en local
+🔗 **Live App:** https://oposiciones-radar-dtecwtbkjjvlkvunvdepwn.streamlit.app/
+
+## Run locally
 ```bash
 pip install streamlit requests --break-system-packages
 streamlit run app.py
 ```
 
-## Desplegarla (como tus otros proyectos, en Streamlit Cloud)
-1. Sube esta carpeta a un repo nuevo en GitHub (ej. `oposiciones-radar`).
-2. Añade un `requirements.txt` con:
+## Deploy (Streamlit Cloud, same as your other projects)
+1. Push this folder to a new GitHub repo (e.g. `oposiciones-radar`).
+2. Add a `requirements.txt` with:
    ```
    streamlit
    requests
    ```
-3. Conecta el repo en https://share.streamlit.io y despliega — igual que hiciste con
-   `cycling-performance-ml` o `credit-risk-scoring-ml`.
+3. Connect the repo at https://share.streamlit.io and deploy — same flow as
+   `cycling-performance-ml` or `credit-risk-scoring-ml`.
 
-## Importante — honestidad sobre lo que cubre cada pestaña
-- **BOE**: 100% automatizado, vía la API oficial de datos abiertos del BOE. No necesita
-  API key. Si un día la estructura del JSON cambia ligeramente, el parsing está hecho
-  a la defensiva (try/except) para no romper la app, pero puede que algún resultado no
-  se capture — revísalo si un día ves 0 resultados en un rango donde esperabas alguno.
-- **DOGC**: no tiene API pública abierta como el BOE, así que en vez de un scraper
-  frágil te doy enlaces de búsqueda ya filtrados con tus palabras clave.
-- **Ajuntaments**: solo Barcelona y Terrassa automatizados como enlace directo, más el
-  buscador CIDO de la Diputació de Barcelona como agregador de toda la provincia.
+## Honest scope of each tab
+- **BOE**: fully automated via the official BOE open-data API. No API key needed.
+  Parsing is defensive (try/except) in case the JSON structure shifts slightly, but
+  if you ever see 0 results in a range where you expected some, it's worth checking.
+- **DOGC**: no open public API like the BOE, so instead of a fragile scraper this tab
+  gives you pre-filtered search links using your keywords.
+- **Ajuntaments**: only Barcelona and Terrassa are wired up as direct links, plus the
+  CIDO search tool from Diputació de Barcelona as a province-wide aggregator.
 
-## Próximos pasos posibles (si quieres ampliarla más adelante)
-- Guardar resultados vistos en `window.storage` (si migras a versión artifact) o en un
-  CSV local, para marcar cuáles ya has revisado.
-- Añadir un envío de email/Telegram cuando aparezca una coincidencia nueva (requeriría
-  desplegarla con un cron, por ejemplo GitHub Actions ejecutando el script en modo
-  headless en vez de la interfaz Streamlit).
+## Possible next steps
+- Store seen results in `window.storage` (if migrated to an artifact) or a local CSV,
+  to mark which ones you've already reviewed.
+- Add email/Telegram alerts when a new match appears (would require running the
+  script headless on a schedule, e.g. via GitHub Actions, instead of the Streamlit UI).
