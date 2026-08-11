@@ -11,9 +11,9 @@ en vez de fingir un scraping robusto que se rompería a la primera):
   - DOGC (Generalitat de Catalunya): no publica una API REST abierta como el BOE. En vez de un
     scraper frágil, la app te genera el enlace directo de búsqueda ya con tus palabras clave.
   - Ajuntament de Barcelona / Ajuntament de Terrassa: enlaces directos a sus portales de
-    processos selectius. Cubrir los 300+ municipios de la provincia de Barcelona con un scraper
-    fiable es un proyecto en sí mismo (cada ayuntamiento tiene su propia web, sin estándar común);
-    aquí se cubren los dos que te interesan a ti y se deja preparado el patrón para añadir más.
+    processos selectius. Además, el CIDO (Diputació de Barcelona) indexa procesos de TODA
+    Catalunya, incluida la zona de Girona vía XALOC — no hace falta scrapear cada municipio
+    uno a uno para tener cobertura razonable de ambas provincias.
 
 Cómo correrla:
     pip install streamlit requests --break-system-packages
@@ -250,30 +250,54 @@ with tab_dogc:
 
 # --- TAB AJUNTAMENTS ---
 with tab_ajuntaments:
-    st.subheader("Ajuntaments clave")
+    st.subheader("Ajuntaments — Barcelona i Girona")
     st.warning(
-        "Cubrir los 300+ ayuntamientos de la provincia de Barcelona con scraping fiable no es "
-        "realista (cada uno tiene web distinta, sin estándar común). Aquí tienes acceso directo "
-        "a los procesos selectivos de los que te interesan a ti, y el patrón para añadir más si "
-        "algún día quieres ampliarlo."
-    )
-    st.link_button(
-        "🏙️ Ajuntament de Barcelona — Processos selectius",
-        "https://seuelectronica.ajuntament.barcelona.cat/processosselectius/",
-        use_container_width=True,
-    )
-    st.link_button(
-        "🏘️ Ajuntament de Terrassa — Oferta pública d'ocupació",
-        "https://aoberta.terrassa.cat/ocupacio/",
-        use_container_width=True,
+        "Cubrir cada ayuntamiento de forma individual con scraping fiable no es realista (webs "
+        "distintas, sin estándar común). Pero el CIDO no es solo de la provincia de Barcelona: "
+        "indexa procesos selectivos de TODA Catalunya, incluida la red de municipios de Girona a "
+        "través de XALOC (el servicio equivalente de la Diputació de Girona)."
     )
 
+    col_bcn, col_girona = st.columns(2)
+
+    with col_bcn:
+        st.markdown("#### 🏙️ Zona Barcelona")
+        st.link_button(
+            "Ajuntament de Barcelona — Processos selectius",
+            "https://seuelectronica.ajuntament.barcelona.cat/processosselectius/",
+            use_container_width=True,
+        )
+        st.link_button(
+            "Ajuntament de Terrassa — Oferta pública d'ocupació",
+            "https://aoberta.terrassa.cat/ocupacio/",
+            use_container_width=True,
+        )
+
+    with col_girona:
+        st.markdown("#### 🏔️ Zona Girona")
+        st.link_button(
+            "Diputació de Girona — Tauler electrònic (oferta d'ocupació pròpia)",
+            "https://seu.ddgi.cat/web/nivell/326/s-1/oferta-d-ocupacio",
+            use_container_width=True,
+        )
+        st.caption(
+            "Los ayuntamientos pequeños de la provincia de Girona suelen gestionar su selección de "
+            "personal a través de XALOC (Xarxa Local de Municipis Gironins), cuyas convocatorias "
+            "también aparecen indexadas en el CIDO — usa los enlaces filtrados de abajo."
+        )
+
     st.divider()
-    st.markdown("**Diputació de Barcelona — CIDO**, agregador de processos selectius de tots els "
-                "municipis de la província (aquest sí que admet cerca per paraula clau en la URL):")
+    st.markdown("**CIDO — buscador de procesos selectivos de toda Catalunya** "
+                "(Diputació de Barcelona, pero indexa también Girona/XALOC):")
     for kw in [k for k in keywords if k.strip()]:
         url_cido = f"https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D={quote_plus(kw)}"
-        st.link_button(f"🔎 Buscar «{kw}» en el CIDO", url_cido, use_container_width=True)
+        st.link_button(f"🔎 Buscar «{kw}» en el CIDO (toda Catalunya)", url_cido, use_container_width=True)
+
+    st.caption(
+        "Tip: dentro del CIDO puedes además filtrar por proximidad geográfica (población + radio en "
+        "km) o por institución concreta (p.ej. 'Ajuntaments de Girona' o 'XALOC') una vez abierto el "
+        "buscador, para acotar aún más sin tener que revisar ayuntamiento por ayuntamiento."
+    )
     st.caption(
         "El CIDO de la Diputació de Barcelona es lo más parecido a un agregador de oposiciones "
         "municipales de toda la provincia — no es una API, pero es el mejor punto único de consulta "

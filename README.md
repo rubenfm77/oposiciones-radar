@@ -12,7 +12,7 @@ candidate profile, across the three administrative layers: national (BOE), regio
 |---|---|---|
 | **BOE** (national) | ✅ Fully automated | Official open-data API, filtered to section "II.B — Oposiciones y concursos", keyword-matched against your target corps (GACE, CSTI, Seguridad Social, Gestión Procesal, Administradores Civiles...). Also shows the full unfiltered list so you can sanity-check the keyword matching yourself. |
 | **Generalitat de Catalunya** | 🔗 Direct link | Links to the official "Treballar a la Generalitat > Oposicions" portal, which centralizes all open calls by corps/department — more useful than the DOGC's own legal-text search engine, which is built for regulations, not job postings. |
-| **Ajuntaments** | 🔗 Direct links | Barcelona and Terrassa specifically, plus the Diputació de Barcelona's CIDO tool as a province-wide aggregator (real keyword search supported in the URL). Covering all 300+ Barcelona-province municipalities reliably isn't realistic — no shared API or format exists across them. |
+| **Ajuntaments** | 🔗 Direct links | Barcelona and Terrassa specifically, plus the Diputació de Girona's "Tauler electrònic" for its own postings. On top of that, the CIDO tool (run by Diputació de Barcelona, but indexing all of Catalonia — including Girona-area municipalities via XALOC) covers province-wide keyword search for both areas. Covering all 300+ individual municipalities reliably isn't realistic — no shared API or format exists across them. |
 
 ## Run locally
 ```bash
