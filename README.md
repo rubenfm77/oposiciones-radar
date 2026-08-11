@@ -1,53 +1,71 @@
 # Oposiciones Radar
 
-Tracks Spanish public sector job openings (*oposiciones*) relevant to a specific
-candidate profile, across the three administrative layers: national (BOE), regional
-(Generalitat de Catalunya), and local (Barcelona-area municipalities).
+A tool for tracking Spanish public sector job openings (*oposiciones*) across the
+three layers of Spanish administration — national (BOE), regional (Generalitat de
+Catalunya), and local (Catalan municipalities) — filtered to a specific candidate
+profile instead of requiring manual daily checks across a dozen disconnected sites.
 
-🔗 **Live App:** https://oposiciones-radar-dtecwtbkjjvlkvunvdepwn.streamlit.app/
+🔗 **Live demo:** https://oposiciones-radar-dtecwtbkjjvlkvunvdepwn.streamlit.app/
 
-## What it actually does
+## Why this exists
 
-| Source | Status | How |
-|---|---|---|
-| **BOE** (national) | ✅ Fully automated | Official open-data API, filtered to section "II.B — Oposiciones y concursos", keyword-matched against your target corps (GACE, CSTI, Seguridad Social, Gestión Procesal, Administradores Civiles...). Also shows the full unfiltered list so you can sanity-check the keyword matching yourself. |
-| **Generalitat de Catalunya** | 🔗 Direct link | Links to the official "Treballar a la Generalitat > Oposicions" portal, which centralizes all open calls by corps/department — more useful than the DOGC's own legal-text search engine, which is built for regulations, not job postings. |
-| **Ajuntaments** | 🔗 Direct links | Barcelona and Terrassa specifically, plus the Diputació de Girona's "Tauler electrònic" for its own postings. On top of that, the CIDO tool (run by Diputació de Barcelona, but indexing all of Catalonia — including Girona-area municipalities via XALOC) covers province-wide keyword search for both areas. Covering all 300+ individual municipalities reliably isn't realistic — no shared API or format exists across them. |
+Public sector job postings in Spain are scattered across sources with no shared
+format: a national open-data API (BOE), a regional government portal with no API,
+and hundreds of municipalities each running their own website. Most people track
+this manually, checking a handful of bookmarks every so often and hoping not to
+miss a filing deadline. This app centralizes that check into one place, being
+explicit about which sources are actually automated versus which are curated
+shortcuts to the right manual search — rather than pretending a shaky scraper
+covers ground it doesn't.
 
-## Run locally
+## What it does
+
+**BOE (national)** — fully automated via the official open-data API. Pulls the
+daily bulletin, filters to the "Oposiciones y concursos" section, and keyword-matches
+titles against a configurable list of target corps. Also surfaces the full
+unfiltered list per date range, since Spanish administrative titles aren't phrased
+consistently enough for keyword matching alone to guarantee completeness.
+
+**Generalitat de Catalunya (regional)** — links directly to the official
+"Treballar a la Generalitat" hub, which lists open calls by corps and department.
+The DOGC's own search engine is built for legal text retrieval, not job postings,
+so it's not a good fit here even though it's the more obvious first guess.
+
+**Ajuntaments (local)** — direct links for Barcelona and Terrassa, plus the CIDO
+tool (built by Diputació de Barcelona but indexing selection processes across all
+of Catalonia, including the Girona area via XALOC) for keyword and geographic-proximity
+search across municipalities without needing a bespoke scraper per town.
+
+## Tech stack
+
+- Python, Streamlit
+- BOE Open Data API (`boe.es/datosabiertos`) — no API key required
+- Defensive JSON parsing: BOE's per-announcement structure isn't fully documented,
+  so fields are normalized and malformed entries are skipped individually rather
+  than crashing the page
+
+## Local development
 ```bash
 pip install streamlit requests --break-system-packages
 streamlit run app.py
 ```
 
-## Deploy (Streamlit Cloud, same flow as the other projects)
-1. Push this folder to a GitHub repo (e.g. `oposiciones-radar`).
-2. Add a `requirements.txt`:
-   ```
-   streamlit
-   requests
-   ```
-3. Connect the repo at https://share.streamlit.io and deploy — same pattern as
-   `cycling-performance-ml` or `credit-risk-scoring-ml`.
+## Design tradeoffs worth knowing about
 
-## Known limitations (by design, not oversight)
-- BOE parsing is defensive (try/except at multiple levels) since the exact JSON
-  structure per announcement isn't fully documented — a malformed entry is skipped
-  rather than crashing the whole page.
-- Keyword matching is substring-based on the announcement title. The BOE doesn't
-  always phrase a given corps the same way twice, so the app also exposes the
-  full unfiltered list per date range — treat the keyword filter as a shortcut,
-  not a guarantee of completeness.
-- Large, relevant convocatorias (GACE, CSTI, etc.) are typically published once or
-  twice a year, not weekly — seeing few or zero matches in a short date window is
-  often expected, not a bug.
-- No scheduled/background checking yet — you open the app and pull data on demand.
+- Keyword matching is substring-based on announcement titles, not semantic — the
+  unfiltered list exists precisely because that filter can miss relevant results
+  phrased differently than expected.
+- Large national convocatorias (GACE, CSTI...) are typically published once or
+  twice a year, so a short date range legitimately returning few or no results
+  isn't necessarily a bug.
+- No background/scheduled checking yet — data is pulled on demand when the page
+  is open, not pushed via alerts.
+- Full scraping of all 300+ Barcelona-province and 200+ Girona-province
+  municipalities was deliberately scoped out: no shared API or HTML structure
+  exists across them, and building one-off scrapers per town doesn't hold up
+  over time.
 
 ## Possible next steps
-- Persist "already seen" results (local CSV, or `window.storage` if migrated to an
-  artifact) to avoid re-reviewing the same announcement.
-- Email/Telegram alerts on new matches — would require running the BOE-fetching
-  logic headless on a schedule (e.g. GitHub Actions) instead of inside the
-  Streamlit UI, which only runs when someone has the page open.
-- Revisit whether a lightweight scraper for a handful of specific municipalities
-  (beyond Barcelona/Terrassa) is worth the maintenance cost.
+
+- Persist "already seen" results to avoid re-reviewing the same announcement.
+- Scheduled checks (e.g. GitHub Actions) with email/Telegram alerts on new matches.
