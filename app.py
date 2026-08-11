@@ -152,7 +152,7 @@ with st.sidebar:
     dias_atras = st.slider("Días hacia atrás a revisar en el BOE", 1, 30, 7)
     st.caption("El BOE no publica sábados, domingos ni festivos — la app los salta sola.")
 
-tab_boe, tab_dogc, tab_ajuntaments = st.tabs(["🇪🇸 BOE (AGE)", "📰 DOGC (Generalitat)", "🏛️ Ajuntaments"])
+tab_boe, tab_dogc, tab_ajuntaments = st.tabs(["🇪🇸 BOE (AGE)", "📰 Generalitat (Oposicions)", "🏛️ Ajuntaments"])
 
 # --- TAB BOE ---
 with tab_boe:
@@ -209,20 +209,30 @@ with tab_boe:
         st.info("Pulsa el botón para consultar el BOE. La primera vez puede tardar unos segundos "
                 "por día consultado (se cachea 1h para no repetir peticiones).")
 
-# --- TAB DOGC ---
+# --- TAB DOGC / GENERALITAT ---
 with tab_dogc:
-    st.subheader("Diari Oficial de la Generalitat de Catalunya")
-    st.warning(
-        "El DOGC no tiene una URL de cercador fija a la que enlazar (es un formulario dinámico "
-        "sin API pública). El enlace más fiable y estable es el del **Portal Jurídic de Catalunya**, "
-        "que es el buscador avanzado oficial de todo el contenido del DOGC desde 1977."
+    st.subheader("Oposicions de la Generalitat de Catalunya")
+    st.info(
+        "Mejor que buscar en el DOGC (que es un buscador de normativa legal, no de convocatorias): "
+        "la Generalitat tiene un portal propio que centraliza todas las oposiciones activas por "
+        "departamento, cuerpo y escala."
     )
-    st.link_button("🔎 Abrir el Portal Jurídic de Catalunya (buscador avanzado del DOGC)",
+    st.link_button("🔎 Abrir «Treballar a la Generalitat» — Oposicions (portal oficial)",
+                    "https://web.gencat.cat/ca/generalitat/treballar-generalitat/oposicions",
+                    use_container_width=True)
+    st.caption(
+        "Dentro de ese portal hay una sección de 'Previsió de convocatòries' con lo que está "
+        "planificado a corto plazo, y el listado de convocatorias abiertas actualmente por cuerpo "
+        "(útil para localizar directamente Cos Superior, Cos de Gestió, etc.)."
+    )
+    st.divider()
+    st.caption(
+        "Si además quieres rastrear el DOGC en sí (normativa, no solo convocatorias), el buscador "
+        "avanzado oficial de todo su contenido desde 1977 está en el Portal Jurídic de Catalunya:"
+    )
+    st.link_button("📖 Portal Jurídic de Catalunya (buscador de normativa DOGC)",
                     "https://portaljuridic.gencat.cat/ca/inici/",
                     use_container_width=True)
-    st.caption("Palabras clave sugeridas para pegar en el buscador: " + ", ".join(
-        [k for k in keywords if k.strip()]
-    ))
 
 # --- TAB AJUNTAMENTS ---
 with tab_ajuntaments:
