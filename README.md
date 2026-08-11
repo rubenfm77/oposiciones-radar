@@ -65,7 +65,27 @@ streamlit run app.py
   exists across them, and building one-off scrapers per town doesn't hold up
   over time.
 
-## Possible next steps
+## Telegram alerts (BOE only)
 
-- Persist "already seen" results to avoid re-reviewing the same announcement.
-- Scheduled checks (e.g. GitHub Actions) with email/Telegram alerts on new matches.
+A separate headless script (`boe_telegram_alert.py`) runs on a schedule via GitHub
+Actions and sends a Telegram message for each **new** BOE match — no need to keep
+the Streamlit app open. It tracks what's already been notified in `seen_ids.json`,
+committed back to the repo after each run, so you're only pinged once per announcement.
+
+**One-time setup:**
+1. Create a bot: message `@BotFather` on Telegram → `/newbot` → follow the prompts →
+   copy the token it gives you.
+2. Get your chat ID: send your new bot any message, then open
+   `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and read the
+   `chat.id` field from the JSON response.
+3. In the GitHub repo: **Settings → Secrets and variables → Actions → New repository
+   secret**, add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
+4. That's it — `.github/workflows/boe_alert.yml` runs it automatically on weekdays.
+   It can also be triggered manually from the **Actions** tab (`workflow_dispatch`) to test.
+
+Scope note: only the BOE is covered here, since it's the only source with a
+reliable API to poll unattended. The Generalitat and Ajuntaments tabs still rely
+on visiting the linked portals directly — there's nothing stable enough to poll
+automatically for those without a real API.
+
+
