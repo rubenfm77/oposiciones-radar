@@ -36,5 +36,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add seen_ids.json
-          git diff --staged --quiet || git commit -m "Update seen_ids.json [skip ci]"
-          git push
+          if git diff --staged --quiet; then
+            echo "seen_ids.json no ha cambiado, nada que commitear."
+          else
+            git commit -m "Update seen_ids.json [skip ci]"
+            git push
+            echo "seen_ids.json actualizado y subido correctamente."
+          fi
