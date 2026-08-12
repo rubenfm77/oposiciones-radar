@@ -31,9 +31,10 @@ st.set_page_config(page_title="Radar de Oposiciones", page_icon="📋", layout="
 # Configuración de palabras clave por defecto (editable desde la barra lateral)
 # ---------------------------------------------------------------------------
 KEYWORDS_DEFAULT = [
-    "gestión",
+    "cuerpo de gestión de la administración",
     "sistemas y tecnologías de la información",
-    "seguridad social",
+    "escala de gestión de la seguridad social",
+    "cuerpo general administrativo de la seguridad social",
     "gestión procesal",
     "tramitación procesal",
     "administradores civiles",
@@ -147,6 +148,11 @@ with st.sidebar:
         value="\n".join(KEYWORDS_DEFAULT),
         height=160,
     ).splitlines()
+    st.caption(
+        "⚠️ Cuanto más corta la palabra clave, más falsos positivos (p. ej. 'gestión' sola "
+        "también engancha 'Instituto Nacional de Gestión Sanitaria', que no tiene nada que ver). "
+        "Usa fragmentos algo más largos y específicos del nombre real del cuerpo/escala."
+    )
 
     st.divider()
     dias_atras = st.slider("Días hacia atrás a revisar en el BOE", 1, 90, 30)
