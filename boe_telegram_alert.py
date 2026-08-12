@@ -41,9 +41,10 @@ import requests
 SEEN_FILE = Path(__file__).parent / "seen_ids.json"
 
 KEYWORDS = [
-    "gestión",
+    "cuerpo de gestión de la administración",
     "sistemas y tecnologías de la información",
-    "seguridad social",
+    "escala de gestión de la seguridad social",
+    "cuerpo general administrativo de la seguridad social",
     "gestión procesal",
     "tramitación procesal",
     "administradores civiles",
@@ -188,6 +189,21 @@ def main():
         print(f"  {fecha_str}: {len(items)} anuncios de oposiciones/concursos")
 
     filtrados = filtra_por_keywords(todos, KEYWORDS)
+
+    # Deduplicado por id, por si el mismo anuncio aparece más de una vez en el sumario
+    # (p. ej. representado tanto dentro de un epígrafe como directamente bajo el
+    # departamento) — sin esto, un mismo anuncio podría enviarse dos veces en una
+    # sola ejecución aunque seen_ids.json funcione perfectamente entre ejecuciones.
+    vistos_en_esta_ejecucion = set()
+    filtrados_unicos = []
+    for it in filtrados:
+        clave = it["id"] or it["titulo"]
+        if clave in vistos_en_esta_ejecucion:
+            continue
+        vistos_en_esta_ejecucion.add(clave)
+        filtrados_unicos.append(it)
+    filtrados = filtrados_unicos
+
     nuevos = [it for it in filtrados if it["id"] and it["id"] not in seen_ids]
 
     print(f"Coincidencias totales: {len(filtrados)} · Nuevas (no notificadas antes): {len(nuevos)}")
